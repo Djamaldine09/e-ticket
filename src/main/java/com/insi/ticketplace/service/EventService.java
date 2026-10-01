@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EventService {
     EventResponse createEvent(EventRequest request, String organizerEmail);
-    EventResponse updateEvent(Long id, EventRequest request, String organizerEmail);
+    EventResponse updateEvent(Long id, EventRequest request, String userEmail, boolean isAdmin);
     EventResponse getById(Long id);
     List<EventResponse> getAll();
     List<EventResponse> getByStatus(EventStatus status);
@@ -23,5 +23,5 @@ public interface EventService {
                                String userEmail,
                                boolean isAdmin,
                                boolean isOrganizer);
-    EventResponse updateImageUrl(Long id, String imageUrl);
+    EventResponse updateImageUrl(Long id, String imageUrl, String userEmail, boolean isAdmin);
 }
