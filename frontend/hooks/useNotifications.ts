@@ -35,6 +35,12 @@ export function useNotifications(isAuthenticated: boolean) {
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      console.error("NEXT_PUBLIC_API_URL is not configured");
+      return;
+    }
+
     let cancelled = false;
 
     Promise.all([
@@ -44,7 +50,8 @@ export function useNotifications(isAuthenticated: boolean) {
       if (cancelled) return;
 
       const client = new Client({
-        webSocketFactory: () => new SockJS("http://localhost:8080/ws") as WebSocket,
+        webSocketFactory: () =>
+          new SockJS(`${apiUrl.replace(/\\/$/, "")}/ws`) as WebSocket,
         connectHeaders: { Authorization: `Bearer ${token}` },
         reconnectDelay: 5000,
         onConnect: () => {
