@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import ThemeToggle from "./ThemeToggle";
+import NotificationBell from "./NotificationBell";
+import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const SIDEBAR_ROUTES = ["/events", "/tickets", "/dashboard", "/notifications", "/settings"];
 
@@ -17,6 +20,9 @@ export default function SidebarWrapper({
 
   const [isOpen, setIsOpen] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const { notifications, unreadCount, markRead, markAllRead } =
+    useNotifications(isAuthenticated);
 
   useEffect(() => {
     setIsMobileOpen(false);
@@ -39,6 +45,7 @@ export default function SidebarWrapper({
         isMobileOpen={isMobileOpen}
         onToggle={() => setIsOpen((v) => !v)}
         onMobileClose={() => setIsMobileOpen(false)}
+        unreadCount={unreadCount}
       />
 
       {/* Mobile hamburger — only when drawer is closed */}
@@ -64,6 +71,18 @@ export default function SidebarWrapper({
         {children}
       </div>
 
+      {isAuthenticated && (
+        <div className="fixed top-4 right-16 z-[100] lg:hidden">
+          <NotificationBell
+            notifications={notifications}
+            unreadCount={unreadCount}
+            onMarkRead={markRead}
+            onMarkAllRead={markAllRead}
+            isOpen={isOpen}
+            placement="top"
+          />
+        </div>
+      )}
       <ThemeToggle />
     </div>
   );
