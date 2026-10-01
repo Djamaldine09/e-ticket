@@ -32,7 +32,7 @@ const CATEGORY_LABELS: Record<EventCategory, string> = {
 
 export default function AdminEventsPage() {
   const router = useRouter();
-  const { hasRole, isAuthenticated, initialized } = useAuth();
+  const { isAuthenticated, initialized, user } = useAuth();
   const [events, setEvents] = useState<EventResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,7 +43,7 @@ export default function AdminEventsPage() {
       router.push("/login");
       return;
     }
-    if (!hasRole("ADMIN")) {
+    if (user?.role !== "ADMIN") {
       router.push("/events");
       return;
     }
@@ -55,7 +55,7 @@ export default function AdminEventsPage() {
         setError(err instanceof Error ? err.message : "Erreur de chargement")
       )
       .finally(() => setLoading(false));
-  }, [initialized, isAuthenticated, hasRole, router]);
+  }, [initialized, isAuthenticated, user?.role, router]);
 
   if (!initialized || loading) {
     return (
