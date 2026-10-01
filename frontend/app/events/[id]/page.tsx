@@ -259,6 +259,12 @@ export default function EventDetailPage({
                   <p className="text-xs text-red-600 dark:text-red-400 mb-2">{manageError}</p>
                 )}
                 <div className="flex items-center gap-2 flex-wrap">
+                  <Link
+                    href={`/events/${event.id}/edit`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                  >
+                    ✏️ Modifier
+                  </Link>
                   {event.status === "DRAFT" && (
                     <button
                       onClick={() => handleManage("publish")}
