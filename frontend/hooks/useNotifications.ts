@@ -51,7 +51,7 @@ export function useNotifications(isAuthenticated: boolean) {
 
       const client = new Client({
         webSocketFactory: () =>
-          new SockJS(`${apiUrl.replace(/\\/$/, "")}/ws`) as WebSocket,
+          new SockJS(`${apiUrl.replace(/\/$/, "")}/ws`) as WebSocket,
         connectHeaders: { Authorization: `Bearer ${token}` },
         reconnectDelay: 5000,
         onConnect: () => {
