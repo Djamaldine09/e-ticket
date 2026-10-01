@@ -39,8 +39,6 @@ const ICONS = {
     "M12 4v16m8-8H4",
   subscription:
     "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
-  notifications:
-    "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
   shield:
     "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
   chevronLeft: "M15 18l-6-6 6-6",
@@ -145,35 +143,42 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, 
         </button>
       </div>
 
+      {/* User profile — top of the menu */}
+      {isAuthenticated && (
+        <div className={`shrink-0 border-b border-white/10 transition-all duration-300 ${isOpen ? "px-4 py-3" : "px-2 py-3"}`}>
+          <div
+            title={!isOpen ? `${user?.firstName} ${user?.lastName}` : undefined}
+            className={`flex items-center rounded-2xl bg-white/10 transition-all duration-300 ${isOpen ? "gap-3 px-3 py-2" : "justify-center px-0 py-2"}`}
+          >
+            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0">
+              {initials}
+            </div>
+            {isOpen && (
+              <div className="min-w-0 flex-1">
+                <p className="text-white text-sm font-semibold truncate leading-tight">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-white/50 text-xs truncate">{user?.role}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className={`flex-1 min-h-0 py-5 space-y-1 overflow-y-auto transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
         {navItem("/events", "Événements", ICONS.events)}
         {isAuthenticated && navItem("/tickets", "Mes billets", ICONS.tickets)}
+        {isAuthenticated && navItem("/settings/security", "Sécurité du compte", ICONS.shield)}
         {isAuthenticated && (
-          <Link
-            href="/notifications"
-            title={!isOpen ? "Notifications" : undefined}
-            className={`relative flex items-center gap-3 py-3 rounded-2xl text-sm font-medium transition-all duration-150 overflow-hidden ${
-              isOpen ? "px-4" : "px-0 justify-center"
-            } ${
-              pathname === "/notifications"
-                ? "bg-white text-indigo-700 shadow-md"
-                : "text-white/70 hover:text-white hover:bg-white/10"
-            }`}
+          <button
+            onClick={handleLogout}
+            title={!isOpen ? "Déconnexion" : undefined}
+            className={`w-full flex items-center gap-3 py-3 rounded-2xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "px-4" : "px-0 justify-center"}`}
           >
-            <span className={`relative shrink-0 ${pathname === "/notifications" ? "text-indigo-600" : "text-current"}`}>
-              <Icon d={ICONS.notifications} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </span>
-            <span className={`whitespace-nowrap transition-all duration-300 ${isOpen ? "opacity-100 w-auto" : "opacity-0 w-0 hidden"}`}>
-              Notifications
-            
-            </span>
-          </Link>
+            <Icon d={ICONS.logout} />
+            {isOpen && <span>Déconnexion</span>}
+          </button>
         )}
         {isAuthenticated &&
           hasRole("ORGANIZER", "ADMIN") &&
@@ -201,38 +206,10 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, 
           navItem("/dashboard/organizer/subscription", "Abonnement", ICONS.subscription)}
       </nav>
 
-      {/* User section */}
-      <div className={`shrink-0 pt-1 pb-1 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
-        {isAuthenticated ? (
-          <div className="space-y-0.5">
-            <div className={`flex items-center rounded-2xl bg-white/10 transition-all duration-300 ${isOpen ? "gap-3 px-3 py-1.5" : "justify-center px-0 py-1.5"}`}>
-              <div
-                title={!isOpen ? `${user?.firstName} ${user?.lastName}` : undefined}
-                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0"
-              >
-                {initials}
-              </div>
-              {isOpen && (
-                <div className="min-w-0 flex-1">
-                  <p className="text-white text-sm font-semibold truncate leading-tight">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-white/50 text-xs truncate">{user?.role}</p>
-                </div>
-              )}
-            </div>
-            {navItem("/settings/security", "Sécurité du compte", ICONS.shield)}
-            <button
-              onClick={handleLogout}
-              title={!isOpen ? "Déconnexion" : undefined}
-              className={`w-full flex items-center py-1.5 rounded-2xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "gap-3 px-4" : "justify-center px-0"}`}
-            >
-              <Icon d={ICONS.logout} />
-              {isOpen && <span>Déconnexion</span>}
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
+      {/* Guest actions stay at the bottom; authenticated actions are already above. */}
+      {!isAuthenticated && (
+        <div className={`shrink-0 pt-1 pb-1 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
+        <div className="space-y-2">
             {isOpen ? (
               <>
                 <Link
@@ -260,8 +237,8 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, 
               </Link>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 }
