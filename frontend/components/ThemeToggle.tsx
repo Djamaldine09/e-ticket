@@ -17,7 +17,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="Basculer le thème"
-      className="fixed top-4 right-4 z-[100] flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md text-zinc-700 dark:text-zinc-200 hover:scale-105 transition-all"
+      className="fixed top-4 right-4 z-[100] flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:scale-105 transition-all"
     >
       {isDark ? (
         <svg
