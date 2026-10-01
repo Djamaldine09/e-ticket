@@ -114,6 +114,25 @@ export default function AdminDashboardPage() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Link
+                  href="/dashboard/admin/events"
+                  className="flex items-center gap-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 hover:border-zinc-400 dark:hover:border-zinc-500 hover:shadow-sm transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-600 transition-colors">
+                    <span className="text-lg">🎟️</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-zinc-900 dark:text-white text-sm">
+                      Gestion des événements
+                    </p>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">
+                      Modifier les événements de tous les organisateurs
+                    </p>
+                  </div>
+                  <svg className="w-4 h-4 text-zinc-400 ml-auto shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+                  </svg>
+                </Link>
+                <Link
                   href="/dashboard/admin/subscriptions"
                   className="flex items-center gap-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-sm transition-all group"
                 >
