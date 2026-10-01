@@ -9,6 +9,7 @@ interface Props {
   onMarkRead: (id: number) => void;
   onMarkAllRead: () => void;
   isOpen: boolean;
+  placement?: "top" | "bottom";
 }
 
 const TYPE_ICON: Record<NotificationType, string> = {
@@ -34,6 +35,7 @@ export default function NotificationBell({
   onMarkRead,
   onMarkAllRead,
   isOpen,
+  placement = "bottom",
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -67,7 +69,11 @@ export default function NotificationBell({
       </button>
 
       {open && (
-        <div className={`absolute z-50 bottom-full mb-2 w-80 rounded-2xl shadow-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden ${isOpen ? "left-0" : "-left-64"}`}>
+        <div className={`absolute z-50 w-80 rounded-2xl shadow-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden ${
+          placement === "top"
+            ? "top-full mt-2 right-0"
+            : `bottom-full mb-2 ${isOpen ? "left-0" : "-left-64"}`
+        }`}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
             <span className="text-sm font-semibold text-zinc-900 dark:text-white">
               Notifications
