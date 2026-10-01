@@ -1,0 +1,28 @@
+.git
+.github
+.idea
+.vscode
+*.iml
+
+# Maven / Java build output
+target/
+**/target/
+
+# Node / frontend dependencies and build output
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+
+# Local environment and secrets
+.env
+*.env
+!.env.example
+
+# Logs / OS files
+*.log
+.DS_Store
+
+# Uploaded runtime files are not baked into the image
+uploads/*
+!uploads/.gitkeep
