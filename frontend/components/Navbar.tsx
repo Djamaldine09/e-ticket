@@ -150,7 +150,7 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }
       </div>
 
       {/* Navigation */}
-      <nav className={`flex-1 py-5 space-y-1 overflow-y-auto transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
+      <nav className={`flex-1 min-h-0 py-5 space-y-1 overflow-y-auto transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
         {navItem("/events", "Événements", ICONS.events)}
         {isAuthenticated && navItem("/tickets", "Mes billets", ICONS.tickets)}
         {isAuthenticated && (
@@ -206,11 +206,11 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }
       </nav>
 
       {/* User section */}
-      <div className={`py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
+      <div className={`shrink-0 py-3 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
         {isAuthenticated ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {isAuthenticated && (
-              <div className={`flex ${isOpen ? "justify-start px-1" : "justify-center"} pb-1`}>
+              <div className={`flex ${isOpen ? "justify-start px-1" : "justify-center"} pb-0.5`}>
                 <NotificationBell
                   notifications={notifications}
                   unreadCount={unreadCount}
@@ -240,7 +240,7 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }
             <button
               onClick={handleLogout}
               title={!isOpen ? "Déconnexion" : undefined}
-              className={`w-full flex items-center py-2.5 rounded-2xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "gap-3 px-4" : "justify-center px-0"}`}
+              className={`w-full flex items-center py-2 rounded-2xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
               <Icon d={ICONS.logout} />
               {isOpen && <span>Déconnexion</span>}
