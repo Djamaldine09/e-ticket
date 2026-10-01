@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -41,7 +43,8 @@ public class FileUploadController {
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
     public ResponseEntity<ApiResponse<EventResponse>> uploadEventImage(
             @PathVariable Long id,
-            @RequestParam("file") MultipartFile file) throws IOException {
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         if (file.isEmpty()) {
             throw new AppException("Fichier vide", HttpStatus.BAD_REQUEST);
@@ -70,7 +73,11 @@ public class FileUploadController {
         }
 
         String imageUrl = secureUrlValue.toString();
-        EventResponse updated = eventService.updateImageUrl(id, imageUrl);
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        EventResponse updated = eventService.updateImageUrl(
+                id, imageUrl, userDetails.getUsername(), isAdmin);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Image uploadée", updated)
