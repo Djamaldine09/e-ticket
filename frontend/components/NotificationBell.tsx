@@ -55,7 +55,7 @@ export default function NotificationBell({
       <button
         onClick={() => setOpen((v) => !v)}
         className={placement === "top"
-          ? "relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md text-zinc-700 dark:text-zinc-200 hover:scale-105 transition-all"
+          ? "relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:scale-105 transition-all"
           : "relative flex items-center justify-center w-9 h-9 rounded-xl hover:bg-white/10 transition-colors"}
         aria-label="Notifications"
       >
