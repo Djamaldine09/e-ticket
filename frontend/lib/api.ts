@@ -7,6 +7,38 @@ function getToken(): string | null {
   return localStorage.getItem("token");
 }
 
+async function parseResponse<T>(res: Response): Promise<ApiResponse<T> | null> {
+  const raw = await res.text();
+
+  if (!raw.trim()) {
+    if (!res.ok) {
+      throw new Error(`HTTP error ${res.status}`);
+    }
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw) as ApiResponse<T>;
+  } catch {
+    const body = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const preview = body.slice(0, 180);
+
+    if (!res.ok) {
+      throw new Error(
+        preview
+          ? `HTTP ${res.status}: ${preview}`
+          : `HTTP error ${res.status}`
+      );
+    }
+
+    throw new Error(
+      preview
+        ? `Réponse serveur invalide (HTTP ${res.status}): ${preview}`
+        : `Réponse serveur invalide (HTTP ${res.status})`
+    );
+  }
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {}
@@ -24,16 +56,24 @@ async function request<T>(
     headers,
   });
 
-  const json = await res.json();
+  const json = await parseResponse<T>(res);
 
   if (!res.ok) {
-    throw new Error(json.message || `HTTP error ${res.status}`);
+    throw new Error(json?.message || `HTTP error ${res.status}`);
   }
 
-  return json as ApiResponse<T>;
+  if (!json) {
+    throw new Error(`Réponse serveur vide (HTTP ${res.status})`);
+  }
+
+  return json;
 }
 
-async function uploadFile<T>(path: string, file: File, fieldName = "file"): Promise<ApiResponse<T>> {
+async function uploadFile<T>(
+  path: string,
+  file: File,
+  fieldName = "file"
+): Promise<ApiResponse<T>> {
   const token = getToken();
   const formData = new FormData();
   formData.append(fieldName, file);
@@ -44,9 +84,17 @@ async function uploadFile<T>(path: string, file: File, fieldName = "file"): Prom
     body: formData,
   });
 
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
-  return json as ApiResponse<T>;
+  const json = await parseResponse<T>(res);
+
+  if (!res.ok) {
+    throw new Error(json?.message || `HTTP error ${res.status}`);
+  }
+
+  if (!json) {
+    throw new Error(`Réponse serveur vide (HTTP ${res.status})`);
+  }
+
+  return json;
 }
 
 export const api = {
