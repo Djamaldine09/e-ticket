@@ -4,7 +4,8 @@ spring:
 
   # Configuration BDD
   datasource:
-    url: jdbc:mysql://localhost:3306/ticket_place?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    # Utilise DB_URL en production (Render/Railway) et permet une valeur explicite en local
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ticket_place?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,7 +13,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update  # Crée/met à jour les tables automatiquement
-    show-sql: true      # Affiche les requêtes SQL en console (dev)
+    show-sql: true      # Affiche les requêtes SQL en console
     properties:
       hibernate:
         format_sql: true
@@ -22,15 +23,16 @@ spring:
     serialization:
       write-dates-as-timestamps: false
     deserialization:
-        fail-on-unknown-properties: false
-        adjust-dates-to-context-time-zone: false
+      fail-on-unknown-properties: false
+      adjust-dates-to-context-time-zone: false
     time-zone: UTC
 
 # Configuration du serveur
 server:
-  port: 8080
+  # Render fournit PORT en production ; 8080 reste le port par défaut en local
+  port: ${PORT:8080}
   error:
-    include-message: always # Affiche les messages d'erreur
+    include-message: always
     include-binding-errors: always
     include-stacktrace: never
 
@@ -56,10 +58,10 @@ logging:
 
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html        # URL d'accès
-    tags-sorter: alpha            # Trie les groupes alphabétiquement
-    operations-sorter: alpha      # Trie les endpoints alphabétiquement
-    display-request-duration: true # Affiche le temps de réponse
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
   api-docs:
-    path: /v3/api-docs            # URL du JSON OpenAPI brut
+    path: /v3/api-docs
   show-actuator: false
