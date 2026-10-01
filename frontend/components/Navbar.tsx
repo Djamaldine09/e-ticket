@@ -202,10 +202,10 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, 
       </nav>
 
       {/* User section */}
-      <div className={`shrink-0 py-3 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
+      <div className={`shrink-0 pt-1 pb-1 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
         {isAuthenticated ? (
-          <div className="space-y-1.5">
-            <div className={`flex items-center rounded-2xl bg-white/10 transition-all duration-300 ${isOpen ? "gap-3 px-3 py-2" : "justify-center px-0 py-2"}`}>
+          <div className="space-y-0.5">
+            <div className={`flex items-center rounded-2xl bg-white/10 transition-all duration-300 ${isOpen ? "gap-3 px-3 py-1.5" : "justify-center px-0 py-1.5"}`}>
               <div
                 title={!isOpen ? `${user?.firstName} ${user?.lastName}` : undefined}
                 className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0"
@@ -225,7 +225,7 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, 
             <button
               onClick={handleLogout}
               title={!isOpen ? "Déconnexion" : undefined}
-              className={`w-full flex items-center py-2 rounded-2xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "gap-3 px-4" : "justify-center px-0"}`}
+              className={`w-full flex items-center py-1.5 rounded-2xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all ${isOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
               <Icon d={ICONS.logout} />
               {isOpen && <span>Déconnexion</span>}
