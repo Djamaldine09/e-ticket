@@ -6,6 +6,7 @@ import com.insi.ticketplace.entity.*;
 import com.insi.ticketplace.exception.AppException;
 import com.insi.ticketplace.repository.EventRepository;
 import com.insi.ticketplace.repository.UserRepository;
+import com.insi.ticketplace.repository.TicketRepository;
 import com.insi.ticketplace.service.EventService;
 import com.insi.ticketplace.service.SubscriptionService;
 import com.cloudinary.Cloudinary;
@@ -28,6 +29,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
     private final Cloudinary cloudinary;
 
     @Value("${app.upload.dir:uploads}")
@@ -65,14 +67,26 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse updateEvent(Long id, EventRequest request,
-                                     String organizerEmail) {
-        Event event = getEventAndCheckOwnership(id, organizerEmail);
+                                     String userEmail, boolean isAdmin) {
+        Event event = getEventForModification(id, userEmail, isAdmin);
 
         validateReservationDeadline(request);
-        // On ne peut modifier qu'un événement en DRAFT
-        if (event.getStatus() != EventStatus.DRAFT) {
+
+        if (event.getStatus() == EventStatus.COMPLETED) {
             throw new AppException(
-                    "Seul un événement en brouillon peut être modifié",
+                    "Un événement terminé ne peut plus être modifié",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        long activeTickets =
+                ticketRepository.countByEventIdAndStatus(id, TicketStatus.RESERVED)
+                        + ticketRepository.countByEventIdAndStatus(id, TicketStatus.PAID)
+                        + ticketRepository.countByEventIdAndStatus(id, TicketStatus.USED);
+
+        if (request.getTotalSeats() < activeTickets) {
+            throw new AppException(
+                    "Le nombre de places ne peut pas être inférieur aux billets déjà réservés ou vendus ("
+                            + activeTickets + ")",
                     HttpStatus.BAD_REQUEST);
         }
 
@@ -81,7 +95,7 @@ public class EventServiceImpl implements EventService {
         event.setEventDate(request.getEventDate());
         event.setLocation(request.getLocation());
         event.setTotalSeats(request.getTotalSeats());
-        event.setAvailableSeats(request.getTotalSeats());
+        event.setAvailableSeats(request.getTotalSeats() - (int) activeTickets);
         event.setPrice(request.getPrice());
         event.setCategory(request.getCategory());
         event.setReservationDeadline(request.getReservationDeadline());
@@ -198,6 +212,28 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
+     * Vérifie les droits de modification :
+     * - ADMIN : peut modifier n'importe quel événement
+     * - ORGANIZER : peut modifier uniquement ses propres événements
+     */
+    private Event getEventForModification(Long id, String userEmail, boolean isAdmin) {
+        Event event = findEventById(id);
+
+        if (isAdmin) {
+            return event;
+        }
+
+        if (event.getOrganizer() == null
+                || !event.getOrganizer().getEmail().equals(userEmail)) {
+            throw new AppException(
+                    "Vous n'êtes pas autorisé à modifier cet événement",
+                    HttpStatus.FORBIDDEN);
+        }
+
+        return event;
+    }
+
+    /**
      * Convertit l'entité Event en EventResponse (DTO).
      * On construit le nom de l'organisateur ici pour ne pas
      * exposer l'objet User entier dans la réponse.
@@ -267,8 +303,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventResponse updateImageUrl(Long id, String imageUrl) {
-        Event event = findEventById(id);
+    public EventResponse updateImageUrl(Long id, String imageUrl, String userEmail, boolean isAdmin) {
+        Event event = getEventForModification(id, userEmail, isAdmin);
+        if (event.getStatus() == EventStatus.COMPLETED) {
+            throw new AppException(
+                    "Un événement terminé ne peut plus être modifié",
+                    HttpStatus.BAD_REQUEST);
+        }
         event.setImageUrl(imageUrl);
         return toResponse(eventRepository.save(event));
     }
