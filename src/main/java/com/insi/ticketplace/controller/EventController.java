@@ -113,10 +113,13 @@ public class EventController {
             @Valid @RequestBody EventRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
         return ResponseEntity.ok(
                 ApiResponse.success("Événement modifié",
                         eventService.updateEvent(id, request,
-                                userDetails.getUsername())));
+                                userDetails.getUsername(), isAdmin)));
     }
 
     @Operation(summary = "Publier un événement (DRAFT → PUBLISHED)",
