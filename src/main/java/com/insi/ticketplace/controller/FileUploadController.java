@@ -7,13 +7,21 @@ import com.insi.ticketplace.dto.response.EventResponse;
 import com.insi.ticketplace.exception.AppException;
 import com.insi.ticketplace.service.EventService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController
@@ -23,6 +31,11 @@ public class FileUploadController {
 
     private final EventService eventService;
     private final Cloudinary cloudinary;
+
+    // Conservé uniquement pour servir les anciennes images déjà enregistrées
+    // avec des URLs /api/uploads/... avant la migration vers Cloudinary.
+    @Value("${app.upload.dir:uploads}")
+    private String legacyUploadDir;
 
     @PostMapping("/events/{id}/image")
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
@@ -39,8 +52,7 @@ public class FileUploadController {
             throw new AppException("Seules les images sont acceptées", HttpStatus.BAD_REQUEST);
         }
 
-        // L'upload est désormais effectué directement dans Cloudinary.
-        // Le backend ne dépend donc plus du filesystem éphémère de Render.
+        // Nouveaux uploads : Cloudinary assure le stockage persistant.
         Map<String, Object> uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
@@ -63,5 +75,36 @@ public class FileUploadController {
         return ResponseEntity.ok(
                 ApiResponse.success("Image uploadée", updated)
         );
+    }
+
+    @GetMapping("/uploads/{filename}")
+    public ResponseEntity<Resource> serveLegacyFile(
+            @PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(legacyUploadDir)
+                    .toAbsolutePath()
+                    .resolve(filename)
+                    .normalize();
+
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
