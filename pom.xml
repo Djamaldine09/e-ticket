@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>  <!-- ✅ Spring Boot 3.x stable -->
+        <version>3.4.3</version>
         <relativePath/>
     </parent>
 
@@ -68,6 +68,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- ===== CLOUDINARY ===== -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http5</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
         <!-- ===== UTILITAIRES ===== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -84,7 +91,7 @@
         <!-- ===== TESTS ===== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>  <!-- ✅ un seul starter test -->
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
