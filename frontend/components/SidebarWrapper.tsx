@@ -51,7 +51,7 @@ export default function SidebarWrapper({
       {/* Mobile hamburger — only when drawer is closed */}
       {!isMobileOpen && (
         <button
-          className="fixed top-4 left-4 z-30 lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md text-zinc-700 dark:text-zinc-200"
+          className="fixed top-4 left-4 z-30 lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
           onClick={() => setIsMobileOpen(true)}
           aria-label="Ouvrir le menu"
         >
