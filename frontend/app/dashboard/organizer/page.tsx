@@ -41,7 +41,7 @@ export default function OrganizerDashboardPage() {
     try {
       const [statsRes, eventsRes] = await Promise.all([
         dashboardService.getOrganizerDashboard(),
-        eventsService.getAll(),
+        eventsService.filter({}),
       ]);
       setStats(statsRes.data);
       const map = new Map<number, EventResponse>();
@@ -228,6 +228,12 @@ export default function OrganizerDashboardPage() {
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        <Link
+                          href={`/events/${ev.eventId}/edit`}
+                          className="rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                        >
+                          ✏️ Modifier
+                        </Link>
                         {status === "DRAFT" && (
                           <button
                             onClick={() => handleAction(ev.eventId, "publish")}
