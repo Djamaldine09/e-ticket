@@ -57,7 +57,7 @@ export default function SidebarWrapper({
       )}
 
       <div
-        className={`flex-1 min-w-0 transition-all duration-300 pt-20 lg:pt-0 ${
+        className={`mobile-page-offset flex-1 min-w-0 transition-all duration-300 ${
           isOpen ? "lg:ml-64" : "lg:ml-18"
         }`}
       >
