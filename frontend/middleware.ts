@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
 
-  const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r));
+  const isEventEdit = /^\/events\/[^/]+\/edit(?:\/|$)/.test(pathname);\n  const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r)) || isEventEdit;
   const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
 
   if (isPrivate && !token) {
@@ -24,5 +24,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/tickets/:path*", "/dashboard/:path*", "/events/new", "/login", "/register"],
+  matcher: ["/tickets/:path*", "/dashboard/:path*", "/events/new", "/events/:id/edit", "/login", "/register"],
 };
