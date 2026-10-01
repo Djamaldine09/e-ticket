@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Routes publiques — pas besoin de token
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/2fa/verify").permitAll()
+                        .requestMatchers("/api/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/uploads/**").permitAll()
