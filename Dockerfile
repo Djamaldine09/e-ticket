@@ -11,7 +11,6 @@ RUN ./mvnw -B -DskipTests dependency:go-offline
 
 # Application sources
 COPY src/ src/
-COPY uploads/ uploads/
 
 # Build the Spring Boot executable JAR
 RUN ./mvnw -B clean package -DskipTests
