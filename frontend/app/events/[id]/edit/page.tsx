@@ -38,8 +38,11 @@ export default function EditEventPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const { hasRole, isAuthenticated, initialized, user } = useAuth();
-  const canEdit = initialized && isAuthenticated && hasRole("ADMIN", "ORGANIZER");
+  const { isAuthenticated, initialized, user } = useAuth();
+  const canEdit =
+    initialized &&
+    isAuthenticated &&
+    (user?.role === "ADMIN" || user?.role === "ORGANIZER");
 
   const [event, setEvent] = useState<EventResponse | null>(null);
   const [form, setForm] = useState({
@@ -63,7 +66,10 @@ export default function EditEventPage({
   useEffect(() => {
     if (!initialized) return;
 
-    if (!isAuthenticated || !hasRole("ADMIN", "ORGANIZER")) {
+    if (
+      !isAuthenticated ||
+      (user?.role !== "ADMIN" && user?.role !== "ORGANIZER")
+    ) {
       router.replace("/events");
       return;
     }
@@ -90,7 +96,7 @@ export default function EditEventPage({
         setError(err instanceof Error ? err.message : "Impossible de charger l'événement");
       })
       .finally(() => setLoading(false));
-  }, [id, initialized, isAuthenticated, hasRole, router]);
+  }, [id, initialized, isAuthenticated, user?.role, router]);
 
   useEffect(() => {
     return () => {
