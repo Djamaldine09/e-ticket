@@ -7,7 +7,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
 
-  const isEventEdit = /^\/events\/[^/]+\/edit(?:\/|$)/.test(pathname);\n  const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r)) || isEventEdit;
+  const isEventEdit = /^\/events\/[^/]+\/edit(?:\/|$)/.test(pathname);
+  const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r)) || isEventEdit;
   const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
 
   if (isPrivate && !token) {
