@@ -8,12 +8,19 @@ import com.insi.ticketplace.repository.EventRepository;
 import com.insi.ticketplace.repository.UserRepository;
 import com.insi.ticketplace.service.EventService;
 import com.insi.ticketplace.service.SubscriptionService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,11 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final Cloudinary cloudinary;
+
+    @Value("${app.upload.dir:uploads}")
+    private String legacyUploadDir;
+
     @Lazy
     private final SubscriptionService subscriptionService;
 
@@ -191,6 +203,8 @@ public class EventServiceImpl implements EventService {
      * exposer l'objet User entier dans la réponse.
      */
     private EventResponse toResponse(Event event) {
+        migrateLegacyImageIfAvailable(event);
+
         return EventResponse.builder()
                 .id(event.getId())
                 .title(event.getTitle())
@@ -209,6 +223,47 @@ public class EventServiceImpl implements EventService {
                 .reservationDeadline(event.getReservationDeadline())
                 .paymentDeadline(event.getPaymentDeadline())
                 .build();
+    }
+
+    /**
+     * Migre automatiquement une ancienne image locale vers Cloudinary
+     * lorsqu'elle est encore présente sur le filesystem du serveur.
+     * Après migration, l'URL Cloudinary est enregistrée en BDD.
+     */
+    private void migrateLegacyImageIfAvailable(Event event) {
+        String currentUrl = event.getImageUrl();
+        if (currentUrl == null || currentUrl.isBlank() || !currentUrl.contains("/api/uploads/")) {
+            return;
+        }
+
+        try {
+            String filename = currentUrl.substring(currentUrl.lastIndexOf("/api/uploads/") + "/api/uploads/".length());
+            filename = Paths.get(filename).getFileName().toString();
+            Path uploadDir = Paths.get(legacyUploadDir).toAbsolutePath().normalize();
+            Path filePath = uploadDir.resolve(filename).normalize();
+
+            if (!filePath.startsWith(uploadDir) || !Files.isRegularFile(filePath) || !Files.isReadable(filePath)) {
+                return;
+            }
+
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(
+                    Files.readAllBytes(filePath),
+                    ObjectUtils.asMap(
+                            "folder", "ticket-place/events",
+                            "resource_type", "image"
+                    )
+            );
+
+            Object secureUrlValue = uploadResult.get("secure_url");
+            if (secureUrlValue == null) {
+                return;
+            }
+
+            event.setImageUrl(secureUrlValue.toString());
+            eventRepository.save(event);
+        } catch (Exception ignored) {
+            // Une ancienne image indisponible ne doit pas empêcher l'événement d'être servi.
+        }
     }
 
     @Override
