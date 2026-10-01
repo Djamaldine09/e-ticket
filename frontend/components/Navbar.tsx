@@ -6,8 +6,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import collapsedIcon from "@/assets/images/Frame 4.png";
 import expandedLogo from "@/assets/images/Frame 4 (1).png";
-import NotificationBell from "@/components/NotificationBell";
-import { useNotifications } from "@/hooks/useNotifications";
 
 function Icon({ d }: { d: string }) {
   return (
@@ -55,9 +53,10 @@ interface NavbarProps {
   isMobileOpen: boolean;
   onToggle: () => void;
   onMobileClose: () => void;
+  unreadCount: number;
 }
 
-export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }: NavbarProps) {
+export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose, unreadCount }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, user, logout, hasRole } = useAuth();
@@ -95,9 +94,6 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }
   const initials = user
     ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
     : "?";
-
-  const { notifications, unreadCount, markRead, markAllRead } =
-    useNotifications(isAuthenticated);
 
   return (
     <aside
@@ -209,17 +205,6 @@ export default function Navbar({ isOpen, isMobileOpen, onToggle, onMobileClose }
       <div className={`shrink-0 py-3 lg:py-4 border-t border-white/10 transition-all duration-300 ${isOpen ? "px-4" : "px-2"}`}>
         {isAuthenticated ? (
           <div className="space-y-1.5">
-            {isAuthenticated && (
-              <div className={`flex ${isOpen ? "justify-start px-1" : "justify-center"} pb-0.5`}>
-                <NotificationBell
-                  notifications={notifications}
-                  unreadCount={unreadCount}
-                  onMarkRead={markRead}
-                  onMarkAllRead={markAllRead}
-                  isOpen={isOpen}
-                />
-              </div>
-            )}
             <div className={`flex items-center rounded-2xl bg-white/10 transition-all duration-300 ${isOpen ? "gap-3 px-3 py-2" : "justify-center px-0 py-2"}`}>
               <div
                 title={!isOpen ? `${user?.firstName} ${user?.lastName}` : undefined}
