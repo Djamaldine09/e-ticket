@@ -13,6 +13,11 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: "Ticket Place",
   description: "Réservez vos billets pour les meilleurs événements",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
