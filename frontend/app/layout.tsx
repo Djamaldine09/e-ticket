@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   title: "Ticket Place",
   description: "Réservez vos billets pour les meilleurs événements",
   icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
     apple: "/icon.png",
   },
 };
