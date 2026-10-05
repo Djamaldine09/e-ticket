@@ -35,6 +35,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        # Le dialect est explicite car la BDD distante peut être temporairement inaccessible au démarrage.
+        # Cela évite que Hibernate échoue avant même que Hikari puisse rétablir la connexion.
+        dialect: org.hibernate.dialect.MySQLDialect
 
   # Jackson : format des dates en JSON
   jackson:
