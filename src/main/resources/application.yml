@@ -10,6 +10,24 @@ spring:
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+    # Pool Hikari robuste pour une base MySQL distante (Aiven/Render)
+    hikari:
+      # Évite de bloquer une requête pendant plusieurs minutes si MySQL est indisponible
+      connection-timeout: 10000
+      validation-timeout: 5000
+      # Maintient les connexions actives lorsque le fournisseur coupe les connexions inactives
+      keepalive-time: 120000
+      # Renouvelle les connexions avant leur expiration côté serveur
+      max-lifetime: 1500000
+      # Ne crée pas un grand nombre de connexions simultanées sur une petite instance
+      maximum-pool-size: 5
+      minimum-idle: 1
+      initialization-fail-timeout: 1
+      data-source-properties:
+        tcpKeepAlive: true
+        useUnicode: true
+        characterEncoding: UTF-8
+
   jpa:
     hibernate:
       ddl-auto: update
